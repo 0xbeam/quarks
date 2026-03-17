@@ -1,67 +1,51 @@
-# ⚛️ Quarks
+# ⚛️ quarks — slack threads → agent instructions
 
-> Converts Slack threads into structured instruction markdown for AI agents.
+> Converts Slack threads into structured instruction markdown for AI agents. Blockers, revisions, approvals, and open questions — auto-categorized so nothing falls through the cracks.
 
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Slack API](https://img.shields.io/badge/Slack-Bot%20API-4A154B?logo=slack&logoColor=white)](https://api.slack.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/) [![Slack API](https://img.shields.io/badge/Slack-Bot%20API-4A154B?logo=slack&logoColor=white)](https://api.slack.com/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Quarks reads a Slack thread — messages, images, reactions, the whole thing — and spits out a structured `.md` file your AI agent can actually act on. Blockers, revisions, approvals, and open questions are auto-categorized so nothing falls through the cracks.
+## Features
 
-## Install
+| Feature | Description |
+|---------|-------------|
+| **Thread → markdown** | Full thread with messages, images, reactions converted to structured `.md` |
+| **Auto-categorization** | Messages classified as blocker, revision, question, approval, or context |
+| **Batch scraping** | Scrape N threads from a channel, or everything since a date |
+| **Image download** | Attached images saved locally alongside the markdown |
+| **Agent-ready output** | Frontmatter, checklists, collapsible thread — optimized for LLM consumption |
+| **Emoji-aware** | Reactions like :octagonal_sign: and :white_check_mark: influence categorization |
+
+## Quick Start
 
 ```bash
-git clone https://github.com/anthropics/Quarks.git && cd Quarks
+git clone https://github.com/0xbeam/quarks.git && cd quarks
 npm install
-cp .env.example .env
+cp .env.example .env   # add SLACK_BOT_TOKEN
 ```
 
-Add your Slack Bot Token to `.env`. The bot needs these scopes:
+## CLI Commands
 
-- `channels:history` — public channel messages
-- `groups:history` — private channel messages
-- `files:read` — download images/files
-- `users:read` — resolve user names
-
-Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps).
-
-## Usage
-
-### Single thread
-
-```bash
-# Basic — just give it a thread URL
-npx thread2md scrape "https://yourworkspace.slack.com/archives/C0123ABC/p1710000000000000"
-
-# Tag it with a project name
-npx thread2md scrape "https://..." --project sanctuary-parc --output ./output
-```
-
-### Batch scrape
-
-```bash
-# Last 10 threads with replies from a channel
-npx thread2md batch C0123ABC --project spacekayak --limit 10
-
-# Everything since a specific date
-npx thread2md batch C0123ABC --since 2026-03-01 --project spacekayak
-```
+| Command | Example | Description |
+|---------|---------|-------------|
+| `scrape` | `npx thread2md scrape "https://slack.com/.../p170..."` | Convert a single thread to markdown |
+| `scrape --project` | `npx thread2md scrape "URL" --project myapp --output ./out` | Tag output with a project name |
+| `batch` | `npx thread2md batch C0123ABC --limit 10` | Last N threads with replies from a channel |
+| `batch --since` | `npx thread2md batch C0123ABC --since 2026-03-01` | All threads since a date |
 
 ## Output Format
 
-Each thread produces a markdown file + downloaded images:
-
 ```
 output/
-├── sanctuary-parc-1710000000-000000.md
+├── project-1710000000-000000.md
 └── images/
     ├── dashboard-v2-light.png
     └── safari-bug-recording.png
 ```
 
-The generated markdown is structured for agent consumption:
+Each markdown file contains:
 
-| Section | What's in it |
-|---------|-------------|
+| Section | Content |
+|---------|---------|
 | **Frontmatter** | Source URL, project, timestamp, message count |
 | **Context** | Original post with reference images |
 | **Blockers** | Critical issues — fix before shipping |
@@ -71,9 +55,7 @@ The generated markdown is structured for agent consumption:
 | **Full Thread** | Collapsible complete conversation |
 | **Agent Instructions** | Actionable checklist with checkboxes |
 
-### Feedback categorization
-
-Messages are auto-categorized based on keywords and emoji reactions:
+## Feedback Categorization
 
 | Category | Keywords | Emoji |
 |----------|----------|-------|
@@ -82,6 +64,16 @@ Messages are auto-categorized based on keywords and emoji reactions:
 | Question | "why", "how", "what if", "?" | :question: :thinking_face: |
 | Approval | "lgtm", "looks good", "ship it" | :white_check_mark: :+1: |
 | Context | Everything else | — |
+
+## Required Slack Bot Scopes
+
+`channels:history` · `groups:history` · `files:read` · `users:read`
+
+Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps).
+
+## Stack
+
+Node.js · Slack Bot API · Markdown
 
 ## License
 
